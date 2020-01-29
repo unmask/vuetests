@@ -20,8 +20,13 @@ export default Vue.component('app-dd', {
   },
   methods: {
     showText () {
+      console.log(this.active)
+      // debugger // eslint-disable-line no-debugger
+      const fetchedData = FetchCall(this.searchedText)
+      fetchedData.then(this.toggleTable)
+    },
+    toggleTable () {
       this.active = true
-      FetchCall(this.searchedText)
     }
   }
 })

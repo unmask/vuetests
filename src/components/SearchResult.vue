@@ -1,11 +1,11 @@
 <template>
     <div>
-        <table v-if="stateValue">
+        <table v-if="stateValue()">
             <tr>
-                <th v-for="item in stateValue" :key="item.header">{{ item.header}}</th>
+                <th v-for="item in stateValue()" :key="item.header">{{ item.header}}</th>
             </tr>
             <tr>
-                <td v-for="item in stateValue" :key="item.header" >{{ item.content}}</td>
+                <td v-for="item in stateValue()" :key="item.header" >{{ item.content}}</td>
             </tr>
         </table>
     </div>
@@ -19,20 +19,21 @@ export default Vue.component('app-table', {
   data: function () {
     return { items: [{}] }
   },
-  computed: {
+  created: function () {
+    this.stateValue()
+  },
+  methods: {
     stateValue: function () {
-      items = [
+      const vectors = store.getters.getSavedData.vectors
+      let items
+      // console.log('hello')
+      vectors && (items = [
         { header: 'ID', content: `${store.state.savedData.id}` },
         { header: 'NAME', content: `${store.state.savedData.firstName}` },
-        { header: 'EMAIL-ID', content: `${(store.state.savedData.vectors.find(vector => vector.type === 'e')) ? (store.state.savedData.vectors.find(vector => vector.type === 'e')).value : '-'}` },
+        { header: 'EMAIL-ID', content: `${(vectors.find((vector) => vector.type === 'e') || null) ? (vectors.find(vector => vector.type === 'e') || null).value : '-'}` },
         { header: 'STATUS', content: `${store.state.savedData.status}` }
-      ]
+      ])
       return items
-    }
-  },
-  watch: {
-    store: function (n, o) {
-      console.log(n)
     }
   }
 })
