@@ -1,28 +1,20 @@
 import Vue from 'vue'
-import Vuex from 'vuex'
+import Vuex, { StoreOptions } from 'vuex'
+
+import { RootState } from './types'
+
+import state from './state'
+import getters from './getters'
+import mutations from './mutation'
+import actions from './actions'
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
-  state: {
-    ifiID: 140827,
-    savedData: []
-  },
-  getters: {
-    getIfiid: state => {
-      return state.ifiID
-    },
-    getSavedData: state => {
-      return state.savedData
-    }
-  },
-  mutations: {
-    saveData (state, payload) {
-      state.savedData = payload
-    }
-  },
-  actions: {
-  },
-  modules: {
-  }
-})
+const store: StoreOptions<RootState> = {
+  state,
+  getters,
+  mutations,
+  actions
+}
+
+export default new Vuex.Store<RootState>(store)

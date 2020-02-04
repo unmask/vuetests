@@ -1,40 +1,36 @@
 <template>
     <div>
-        <table v-if="stateValue()">
+        <table v-if="stateValue">
             <tr>
-                <th v-for="item in stateValue()" :key="item.header">{{ item.header}}</th>
+                <th v-for="item in stateValue" :key="item.header">{{ item.header}}</th>
             </tr>
             <tr>
-                <td v-for="item in stateValue()" :key="item.header" >{{ item.content}}</td>
+                <td v-for="item in stateValue" :key="item.header" >{{ item.content}}</td>
             </tr>
         </table>
     </div>
 </template>
 
-<script>
-import Vue, { component } from 'vue'
-import store from '@/store'
-export default Vue.component('app-table', {
-  props: ['value'],
-  data: function () {
-    return { items: [{}] }
-  },
-  created: function () {
-    this.stateValue()
-  },
-  methods: {
-    stateValue: function () {
-      const vectors = store.getters.getSavedData.vectors
-      let items
-      // console.log('hello')
-      vectors && (items = [
-        { header: 'ID', content: `${store.state.savedData.id}` },
-        { header: 'NAME', content: `${store.state.savedData.firstName}` },
-        { header: 'EMAIL-ID', content: `${(vectors.find((vector) => vector.type === 'e') || null) ? (vectors.find(vector => vector.type === 'e') || null).value : '-'}` },
-        { header: 'STATUS', content: `${store.state.savedData.status}` }
-      ])
-      return items
-    }
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+import { Getter } from 'vuex-class'
+import { GET_SAVED_DATA } from '@/store/types'
+import { SearchResponseTypes } from '@/services/types'
+@Component
+export default class SearchResult extends Vue {
+  @Getter(GET_SAVED_DATA) private savedData!: SearchResponseTypes.RootResponse
+  get stateValue (): object {
+    const { savedData } = this
+    const { vectors, id, firstName, status } = savedData || []
+    const emailID:SearchResponseTypes.Vector | undefined = savedData && vectors.find((vector) => vector.type === 'e')
+    debugger // eslint-disable-line no-debugger
+    const items = [
+      { header: 'ID', content: id || '-' },
+      { header: 'NAME', content: firstName || '-' },
+      { header: 'EMAIL-ID', content: emailID ? emailID.value : '-' },
+      { header: 'STATUS', content: status || '-' }
+    ]
+    return items
   }
-})
+}
 </script>

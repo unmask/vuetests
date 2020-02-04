@@ -1,33 +1,36 @@
 <template>
   <div>
-    <input-field v-bind:value="searchedText" v-on:input="searchedText = $event"/>
+    <InputField v-on:input="searchedText = $event"/>
     <button v-on:click="showText">search</button>
-    <app-table v-bind:value="searchedText" v-if="active" />
-    <app-home />
+    <SearchResult v-if="active" />
   </div>
 </template>
 
-<script>
-import Vue, { component } from 'vue'
-import Inputfield from '@/components/InputField'
+<script lang="ts">
+import { Component, Vue } from 'vue-property-decorator'
+import { Action } from 'vuex-class'
+import InputField from '@/components/InputField.vue'
 import FetchCall from '@/services/api-services'
-import HomePage from '@/components/HomePage'
-import SearchResult from '@/components/SearchResult'
-export default Vue.component('app-dd', {
-  data: function () {
-    return { searchedText: '',
-      active: false }
-  },
-  methods: {
-    showText () {
-      console.log(this.active)
-      // debugger // eslint-disable-line no-debugger
-      const fetchedData = FetchCall(this.searchedText)
-      fetchedData.then(this.toggleTable)
-    },
-    toggleTable () {
-      this.active = true
-    }
+import SearchResult from '@/components/SearchResult.vue'
+import { SET_SAVED_DATA } from '@/store/mutation.types'
+import { SearchResponseTypes } from '@/services/types'
+@Component({
+  components: {
+    InputField,
+    SearchResult
   }
 })
+export default class App extends Vue {
+  private searchedText: string = ''
+  private active: Boolean = false
+  @Action(SET_SAVED_DATA)
+  private fetchResults!: (_:string) => void
+  showText () {
+    this.fetchResults(this.searchedText)
+    this.showTable()
+  }
+  showTable () {
+    this.active = true
+  }
+}
 </script>
